@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Service desk templates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EEF2F6; --surface: #FFFFFF; --ink: #17202E; --muted: #586477; --line: #CFD7E2;
+    --focus: #2F5BD3; --mark: #FFE68A; --danger: #C2394A;
+    --c-access: #2F5BD3; --c-hardware: #0F8A86; --c-hr: #7A4CC2; --c-login: #B7700C; --c-network: #2E8B3E; --c-security: #C2394A; --c-software: #B23A7A;
+    --s-todo: #2F5BD3; --s-check: #B7700C; --s-done: #2E8B3E; --s-skip: #8A94A3;
+    color-scheme: light; box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10151D; --surface: #19202B; --ink: #E6EBF2; --muted: #9AA6B8; --line: #2E3846;
+      --focus: #7FA0F5; --mark: #6B5A12; --danger: #F07A88;
+      --c-access: #7FA0F5; --c-hardware: #4CC4BF; --c-hr: #B293EA; --c-login: #E7A94A; --c-network: #6CC77B; --c-security: #F07A88; --c-software: #EE86BE;
+      --s-todo: #7FA0F5; --s-check: #E7A94A; --s-done: #6CC77B; --s-skip: #7C8797;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #10151D; --surface: #19202B; --ink: #E6EBF2; --muted: #9AA6B8; --line: #2E3846;
+    --focus: #7FA0F5; --mark: #6B5A12; --danger: #F07A88;
+    --c-access: #7FA0F5; --c-hardware: #4CC4BF; --c-hr: #B293EA; --c-login: #E7A94A; --c-network: #6CC77B; --c-security: #F07A88; --c-software: #EE86BE;
+    --s-todo: #7FA0F5; --s-check: #E7A94A; --s-done: #6CC77B; --s-skip: #7C8797;
+    color-scheme: dark;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.45;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 20px 64px; }
+  header { display: grid; gap: 6px; margin-bottom: 22px; }
+  h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.1; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { margin: 0; color: var(--muted); max-width: 64ch; }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 20px; overflow-x: auto; }
+  .tab {
+    font: inherit; font-weight: 600; background: none; border: 0; border-bottom: 3px solid transparent;
+    color: var(--muted); padding: 10px 14px 9px; cursor: pointer; white-space: nowrap; border-radius: 0;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--focus); }
+  .tab .n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; margin-left: 4px; }
+
+  .tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 22px; }
+  input, textarea, select {
+    font: inherit; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--surface); color: var(--ink); width: 100%;
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  .search { flex: 1 1 280px; width: auto; padding: 10px 14px; }
+  button {
+    font: inherit; font-weight: 500; padding: 9px 14px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--surface); color: var(--ink); cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--focus); border-color: var(--focus); color: #fff; }
+  :root[data-theme="dark"] button.primary { color: #0E1420; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) button.primary { color: #0E1420; } }
+  button.link { border: 0; background: none; padding: 4px 6px; color: var(--muted); }
+  button.link:hover { color: var(--ink); }
+  button.danger { color: var(--danger); }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .status { width: 100%; color: var(--muted); font-size: 14px; margin: 0; }
+  .hidden { display: none !important; }
+  mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1px; }
+  .empty { color: var(--muted); padding: 20px 0; margin: 0; }
+
+  /* Current templates */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 22px; padding: 0; list-style: none; }
+  .legend button { border: 0; background: none; padding: 2px 0; display: inline-flex; align-items: center; gap: 8px; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+  .legend .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .grid { columns: 340px; column-gap: 18px; }
+  .cat {
+    break-inside: avoid; margin: 0 0 18px; background: var(--surface); border: 1px solid var(--line);
+    border-top: 4px solid var(--c); border-radius: 6px; padding: 16px 18px 14px;
+  }
+  .cat h2 { font-size: 19px; margin: 0 0 10px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .cat h2 .n { font-size: 14px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+  ul.tree, ul.tree ul { list-style: none; margin: 0; padding: 0; }
+  ul.tree ul { margin-left: 9px; padding-left: 14px; border-left: 1px solid var(--line); }
+  ul.tree li { position: relative; }
+  ul.tree ul > li::before { content: ""; position: absolute; left: -14px; top: 15px; width: 10px; border-top: 1px solid var(--line); }
+  details > summary { list-style: none; cursor: pointer; padding: 5px 0; font-weight: 600; display: flex; align-items: center; gap: 8px; border-radius: 4px; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary .chev {
+    width: 8px; height: 8px; flex: none; border-right: 2px solid var(--c); border-bottom: 2px solid var(--c);
+    transform: rotate(-45deg); transition: transform .15s ease; margin: 0 2px;
+  }
+  details[open] > summary .chev { transform: rotate(45deg); }
+  details > summary .n { font-weight: 400; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .leaf { padding: 5px 0; display: flex; gap: 9px; align-items: baseline; }
+  .leaf::before { content: ""; width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--c); opacity: .75; transform: translateY(-2px); }
+
+  /* Proposed additions */
+  .proposed { max-width: 760px; }
+  ol.plist { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+  .item { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; padding: 10px 14px; border-top: 1px solid var(--line); align-items: baseline; }
+  .item:first-child { border-top: 0; }
+  .item .name { font-weight: 600; }
+  .item .notes { grid-column: 1; color: var(--muted); font-size: 14px; white-space: pre-wrap; }
+  .item .right { grid-column: 2; grid-row: 1; display: flex; gap: 6px; align-items: baseline; white-space: nowrap; }
+  .badge { font-size: 13px; font-weight: 600; color: var(--s); display: inline-flex; align-items: center; gap: 6px; }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--s); }
+  .item.skip .name { text-decoration: line-through; color: var(--muted); }
+  .item.editing { display: block; background: var(--bg); }
+  .item form { display: grid; gap: 8px; }
+  .row { display: grid; grid-template-columns: 1fr 180px; gap: 8px; }
+  label { display: grid; gap: 4px; font-size: 13px; font-weight: 500; color: var(--muted); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; align-items: center; }
+  .actions .spacer { flex: 1; }
+  @media (max-width: 560px) {
+    .row, .item { grid-template-columns: 1fr; }
+    .item .right { grid-column: 1; grid-row: auto; }
+  }
+  .note { font-size: 14px; color: var(--muted); margin: 0 0 14px; }
+  .note.warn { color: var(--danger); }
+
+  /* Incident / service request groups */
+  .group { margin-bottom: 30px; }
+  .group-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 4px; }
+  .group-head h2 { font-size: 23px; margin: 0; }
+  .group-head .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .group-desc { margin: 0 0 14px; color: var(--muted); }
+
+  /* Suggested layout markers */
+  .intro { margin: 0 0 14px; color: var(--muted); max-width: 70ch; }
+  .why { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--focus); border-radius: 6px; padding: 12px 16px; margin: 0 0 24px; max-width: 760px; }
+  .why h2 { font-size: 16px; margin: 0 0 4px; }
+  .why p { margin: 0; }
+  .cat-tag { margin: -6px 0 8px; font-size: 13px; font-weight: 600; color: var(--c); }
+  .tag { font-size: 12px; font-weight: 600; color: var(--c); border: 1px solid var(--c); border-radius: 999px; padding: 0 8px; white-space: nowrap; }
+  .later { margin: 10px 0 0; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 6px; color: var(--muted); font-size: 14px; }
+
+  /* Suggestions */
+  .suggest { max-width: 760px; }
+  .compose { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px; display: grid; gap: 10px; margin-bottom: 18px; }
+  .compose.drag { border-color: var(--focus); }
+  .compose textarea { border: 0; padding: 4px 2px; min-height: 70px; background: transparent; }
+  .compose textarea:focus-visible { outline: none; }
+  .compose:focus-within { border-color: var(--focus); }
+  .compose .bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 10px; }
+  .compose .hint { color: var(--muted); font-size: 13px; flex: 1; min-width: 160px; }
+  .thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .thumbs:empty { display: none; }
+  .thumb { position: relative; width: 84px; height: 84px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: var(--bg); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in; }
+  .thumb .x { position: absolute; top: 3px; right: 3px; width: 24px; height: 24px; padding: 0; border-radius: 50%; line-height: 1; font-size: 15px; }
+  .thumb .busy { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; color: var(--muted); background: var(--bg); }
+  ol.slist { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+  .sug { padding: 12px 14px; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+  .sug:first-child { border-top: 0; }
+  .sug .meta { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 13px; align-items: baseline; }
+  .sug .text { white-space: pre-wrap; margin: 0; }
+  .sug .thumbs .thumb { width: 120px; height: 90px; }
+  .lightbox { position: fixed; inset: 0; z-index: 50; background: rgba(8, 12, 18, .85); display: grid; place-items: center;
+    padding: calc(env(safe-area-inset-top, 0px) + 20px) 20px calc(env(safe-area-inset-bottom, 0px) + 20px); cursor: zoom-out; }
+  .lightbox img { max-width: 100%; max-height: 100%; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) { details > summary .chev { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Service desk templates</h1>
+    <p class="sub" style="font-size:13px">Read-only snapshot taken November 6, 2026.</p>
+    <p class="sub" id="summary">Every ticket template currently in the app, plus a working list of templates you may want to add.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Views">
+    <button class="tab" role="tab" id="tab-current" aria-controls="view-current" data-view="current">Current templates<span class="n" id="n-current"></span></button>
+    <button class="tab" role="tab" id="tab-suggestions" aria-controls="view-suggestions" data-view="suggestions">Suggested template style<span class="n" id="n-suggestions"></span></button>
+    <button class="tab" role="tab" id="tab-proposed" aria-controls="view-proposed" data-view="proposed">Proposed additions<span class="n" id="n-proposed"></span></button>
+    <button class="tab" role="tab" id="tab-noticed" aria-controls="view-noticed" data-view="noticed">Things noticed<span class="n" id="n-noticed"></span></button>
+  </div>
+
+  <div class="tools">
+    <input class="search" id="q" type="search" placeholder="Search everything, e.g. password, SharePoint, vendor" aria-label="Search templates, suggested template style, proposed additions, and notes">
+    <button id="expand" type="button">Expand all</button>
+    <button id="collapse" type="button">Collapse all</button>
+    <p class="status" id="status" aria-live="polite"></p>
+  </div>
+
+  <section id="view-current" role="tabpanel" aria-labelledby="tab-current">
+    <div class="group" id="group-incident">
+      <div class="group-head"><h2>Incidents</h2><span class="n" id="gn-incident"></span></div>
+      <p class="group-desc">Something is broken or not working.</p>
+      <div class="grid" id="grid-incident"></div>
+    </div>
+    <div class="group" id="group-service">
+      <div class="group-head"><h2>Service requests</h2><span class="n" id="gn-service"></span></div>
+      <p class="group-desc">Asking for something new, like access, software, or an HR change.</p>
+      <div class="grid" id="grid-service"></div>
+    </div>
+    <p class="empty hidden" id="empty-current">No current templates match that search.</p>
+  </section>
+
+  <section id="view-suggestions" role="tabpanel" aria-labelledby="tab-suggestions" class="hidden">
+    <p class="intro">How the templates could look with Hardware and Software split into their own categories. This is a suggestion only; nothing has changed in the app.</p>
+    <div class="why">
+      <h2>Why split them</h2>
+      <p>Only one of the current subgroups (“Problem with computer program”) is really software related, so maybe we could create separate Hardware Issues and Software Issues categories. That would keep Hardware Issues focused on printers, equipment, and Mac/PC problems, while giving software related requests their own place. I think it would make categories more clear for users, and it would also give us a good spot for things like adding SharePoint site issues and conferencing issues if we decide to add them.</p>
+    </div>
+    <div class="group" id="sg-group-incident">
+      <div class="group-head"><h2>Incidents</h2><span class="n" id="sg-gn-incident"></span></div>
+      <p class="group-desc">Something is broken or not working.</p>
+      <div class="grid" id="sg-grid-incident"></div>
+    </div>
+    <div class="group" id="sg-group-service">
+      <div class="group-head"><h2>Service requests</h2><span class="n" id="sg-gn-service"></span></div>
+      <p class="group-desc">Asking for something new, like access, software, or an HR change.</p>
+      <div class="grid" id="sg-grid-service"></div>
+    </div>
+    <p class="empty hidden" id="empty-sug">No templates in the suggested layout match that search.</p>
+  </section>
+
+  <section id="view-proposed" role="tabpanel" aria-labelledby="tab-proposed" class="proposed hidden">
+    <p class="note" id="p-note">Loading the list…</p>
+    <ol class="plist" id="plist"></ol>
+    <p class="empty hidden" id="empty-proposed"></p>
+  </section>
+
+  <section id="view-noticed" role="tabpanel" aria-labelledby="tab-noticed" class="suggest hidden">
+    <p class="note" id="s-note">Loading notes…</p>
+    <div class="compose hidden" id="compose">
+      <textarea id="s-text" maxlength="4000" aria-label="Note" placeholder="Write a note. You can paste screenshots right into this box."></textarea>
+      <div class="thumbs" id="s-pending"></div>
+      <div class="bar">
+        <span class="hint" id="s-hint">Paste or drop photos here, or use Add photo.</span>
+        <input type="file" id="s-file" accept="image/*" multiple class="hidden">
+        <button type="button" id="s-photo">Add photo</button>
+        <button type="button" class="primary" id="s-save">Save note</button>
+      </div>
+    </div>
+    <ol class="slist hidden" id="slist"></ol>
+    <p class="empty hidden" id="empty-noticed"></p>
+  </section>
+</div>
+<div class="lightbox hidden" id="lightbox" role="dialog" aria-label="Photo"><img alt=""></div>
+
+<script>
+/* ---------- Current templates (from the app screenshot) ---------- */
+const DATA = [
+  { name: "Access Request", key: "access", type: "service", items: [
+    { name: "Access to phones", items: ["Phone request (Five9, Teams, Zoom)"] },
+    { name: "AI platform access", items: ["AI access (Claude, Claude Premium, Copilot, SanasAI, Other)"] },
+    { name: "Approved software", items: [
+      { name: "Licensed Software Install", items: ["Adobe pro", "Adobe sign", "Snagit", "Ablebits", "Camtasia", "VS Code Pro"] },
+      { name: "Standard Software install", items: ["Launchpad", "Adobe Reader"] }
+    ]},
+    { name: "Dynamics", items: ["Dynamics Access"] },
+    { name: "Email access or mailbox created", items: [
+      "New email creation", "Email client installation", "Increase email storage",
+      "Deletion of an email account", "Request password reset for your email address"
+    ]}
+  ]},
+  { name: "Hardware Issue", key: "hardware", type: "incident", items: [
+    { name: "Problem with computer program", items: ["Application won’t open or is not working", "Software install", "Software login issue on PC/MAC"] },
+    { name: "Printer or scanner", items: ["Printer or Scanner Add/Remove", "Printer or scanner issues"] },
+    { name: "Computer equipment", items: ["Desk setup issue", "Monitor issue", "Mouse and Keyboard issue", "Request additional hardware"] },
+    { name: "Problems with Mac/PC", items: ["Physically broken or unusable", "Slow/freezing", "Will not power on"] }
+  ]},
+  { name: "Human Resources", key: "hr", type: "service", items: [
+    "Employee change (manager change, name change, title/role, transfer, other)",
+    "Employee Data access request",
+    "Leave of absence (return from LOA or Start LOA)",
+    "Legal hold/discovery",
+    "Life cycle replacement",
+    "New hire request",
+    "Offboarding",
+    "Termination Reminder"
+  ]},
+  { name: "Login Issues", key: "login", type: "incident", items: [
+    { name: "Problems with a password", items: ["MyApps or VPN Password Issues", "PC or Mac Password issue", "Website password issue"] }
+  ]},
+  { name: "Network Issues", key: "network", type: "incident", items: [
+    "An office location is without internet", "Internet slow or not connecting", "Other internet issue"
+  ]},
+  { name: "Security", key: "security", type: "incident", items: [
+    { name: "Report a security problem", items: ["Compromised Device or Account", "PC/Mac was lost or stolen", "Suspicious email or message"] }
+  ]}
+];
+
+const STATUSES = [
+  { key: "todo",  label: "To add" },
+  { key: "check", label: "Needs confirmation" },
+  { key: "done",  label: "Added" },
+  { key: "skip",  label: "Not needed" }
+];
+const statusLabel = k => (STATUSES.find(s => s.key === k) || STATUSES[0]).label;
+const statusKey = k => STATUSES.some(s => s.key === k) ? k : "todo";
+
+const countLeaves = n => typeof n === "string" ? 1 : n.items.reduce((s, c) => s + countLeaves(c), 0);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const hl = (text, term) => {
+  if (!term) return esc(text);
+  const i = text.toLowerCase().indexOf(term);
+  return i < 0 ? esc(text) : esc(text.slice(0, i)) + "<mark>" + esc(text.slice(i, i + term.length)) + "</mark>" + esc(text.slice(i + term.length));
+};
+
+const $ = id => document.getElementById(id);
+const q = $("q"), statusEl = $("status");
+const total = DATA.reduce((s, c) => s + countLeaves(c), 0);
+const TYPES = ["incident", "service"];
+const typeTotalOf = (data, t) => data.filter(c => c.type === t).reduce((s, c) => s + countLeaves(c), 0);
+const typeTotal = t => typeTotalOf(DATA, t);
+
+/* Suggested layout: Hardware and Software split (built from the current templates) */
+const HW = DATA.find(c => c.key === "hardware");
+const SW_GROUP = HW.items.find(g => g.name === "Problem with computer program");
+const SUGGESTED = [
+  { name: "Hardware Issues", key: "hardware", type: "incident", catTag: "Software templates moved out",
+    items: HW.items.filter(g => g !== SW_GROUP) },
+  { name: "Software Issues", key: "software", type: "incident", catTag: "New category",
+    items: [Object.assign({}, SW_GROUP, { tag: "Moved from Hardware" })],
+    later: "Room for later: SharePoint site issues, conferencing issues" },
+  ...DATA.filter(c => c !== HW)
+];
+
+function renderNode(node) {
+  const li = document.createElement("li");
+  if (typeof node === "string") {
+    li.className = "leaf"; li.dataset.text = node;
+    li.innerHTML = `<span class="label">${esc(node)}</span>`;
+    return li;
+  }
+  const d = document.createElement("details");
+  d.open = true; d.dataset.text = node.name;
+  d.innerHTML = `<summary><span class="chev" aria-hidden="true"></span><span class="label">${esc(node.name)}</span><span class="n">${countLeaves(node)}</span>${node.tag ? `<span class="tag">${esc(node.tag)}</span>` : ""}</summary>`;
+  const ul = document.createElement("ul");
+  node.items.forEach(c => ul.appendChild(renderNode(c)));
+  d.appendChild(ul); li.appendChild(d);
+  return li;
+}
+
+function buildView(data, prefix) {
+  data.filter(c => c.type === "incident").concat(data.filter(c => c.type === "service")).forEach(cat => {
+    const n = countLeaves(cat);
+    const sec = document.createElement("section");
+    sec.className = "cat"; sec.style.setProperty("--c", `var(--c-${cat.key})`); sec.dataset.key = cat.key; sec.dataset.type = cat.type;
+    sec.innerHTML = `<h2><span>${esc(cat.name)}</span><span class="n">${n} template${n === 1 ? "" : "s"}</span></h2>` +
+      (cat.catTag ? `<p class="cat-tag">${esc(cat.catTag)}</p>` : "");
+    const ul = document.createElement("ul"); ul.className = "tree";
+    cat.items.forEach(c => ul.appendChild(renderNode(c)));
+    sec.appendChild(ul);
+    if (cat.later) { const p = document.createElement("p"); p.className = "later"; p.textContent = cat.later; sec.appendChild(p); }
+    $(prefix + "grid-" + cat.type).appendChild(sec);
+  });
+}
+buildView(DATA, "");
+buildView(SUGGESTED, "sg-");
+
+function filterView(rootId, prefix, emptyId, data, term) {
+  const root = $(rootId);
+  let hits = 0;
+  function walk(li, parentMatched) {
+    if (li.classList.contains("leaf")) {
+      const m = parentMatched || !term || li.dataset.text.toLowerCase().includes(term);
+      li.classList.toggle("hidden", !m);
+      li.querySelector(".label").innerHTML = hl(li.dataset.text, term);
+      if (m) hits++;
+      return m;
+    }
+    const d = li.querySelector(":scope > details");
+    const selfMatch = !!term && d.dataset.text.toLowerCase().includes(term);
+    let any = false;
+    d.querySelectorAll(":scope > ul > li").forEach(c => { if (walk(c, parentMatched || selfMatch)) any = true; });
+    li.classList.toggle("hidden", !any);
+    d.querySelector(":scope > summary > .label").innerHTML = hl(d.dataset.text, term);
+    if (term && any) d.open = true;
+    return any;
+  }
+  let visible = 0;
+  TYPES.forEach(t => {
+    const before = hits;
+    const groupMatch = !!term && (t === "incident" ? "incidents" : "service requests").includes(term);
+    let groupAny = false;
+    root.querySelectorAll(`.cat[data-type="${t}"]`).forEach(sec => {
+      const catMatch = groupMatch || (!!term && sec.querySelector("h2 span").textContent.toLowerCase().includes(term));
+      let any = false;
+      sec.querySelectorAll(":scope > ul.tree > li").forEach(li => { if (walk(li, catMatch)) any = true; });
+      sec.classList.toggle("hidden", !any);
+      if (any) { visible++; groupAny = true; }
+    });
+    $(prefix + "group-" + t).classList.toggle("hidden", !groupAny);
+    const n = term ? hits - before : typeTotalOf(data, t);
+    $(prefix + "gn-" + t).textContent = `${n} template${n === 1 ? "" : "s"}`;
+  });
+  $(emptyId).classList.toggle("hidden", visible > 0);
+  return hits;
+}
+
+/* ---------- Proposed additions (shared, editable) ---------- */
+let items = [{"id": "p01", "title": "Foreign Travel", "notes": "", "status": "todo", "order": 1}, {"id": "p02", "title": "Conferencing (issues, service, and access)", "notes": "Old desk had Conferencing Issues, Conferencing – Access Request, and Conferencing – Service Request. The current app only has Phone request (Five9, Teams, Zoom).", "status": "todo", "order": 2}, {"id": "p03", "title": "Secret Server – Delinea", "notes": "Includes Thycotic Agent Install (Thycotic is Delinea’s former name, so one template may cover both).", "status": "todo", "order": 3}, {"id": "p04", "title": "Azure DevOps requests", "notes": "", "status": "todo", "order": 4}, {"id": "p05", "title": "SharePoint", "notes": "Old desk had: SharePoint site issues, access request (add or remove from a site), and create or delete a site.", "status": "todo", "order": 5}, {"id": "p06", "title": "Authenticator reset/issues", "notes": "", "status": "todo", "order": 6}, {"id": "p07", "title": "New Vendor", "notes": "Could cover new software or vendor requests, vendor/contractor access, and vendor access removal.", "status": "todo", "order": 7}, {"id": "p08", "title": "Create Service User", "notes": "Follows a set procedure, so the form can collect environment, user name, email, and role up front.", "status": "todo", "order": 8}, {"id": "p09", "title": "Entra App Registration", "notes": "Over 90 tickets in the old service desk.", "status": "todo", "order": 9}, {"id": "p10", "title": "People Cloud User Access", "notes": "", "status": "todo", "order": 10}, {"id": "p11", "title": "OnRamp Issues", "notes": "Confirm whether OnRamp is still in use before adding.", "status": "check", "order": 11}];          // [{id, title, notes, status, order}]
+let loaded = true, dbAvail = true, canWrite = false;
+let editingId = null, confirmDeleteId = null, statusFilter = "all";
+let col = null;
+
+const plist = $("plist"), pNote = $("p-note");
+const statusOptions = sel => STATUSES.map(s => `<option value="${s.key}"${s.key === sel ? " selected" : ""}>${s.label}</option>`).join("");
+
+function matchItem(it, term) {
+  return !term || it.title.toLowerCase().includes(term) || (it.notes || "").toLowerCase().includes(term);
+}
+
+function renderProposed() {
+  const term = q.value.trim().toLowerCase();
+  const shown = items.filter(it => matchItem(it, term));
+  plist.classList.toggle("hidden", !shown.length);
+  plist.innerHTML = shown.map(it => {
+    const s = `--s: var(--s-${it.status})`;
+    if (it.id === editingId) {
+      const del = confirmDeleteId === it.id
+        ? `<button type="button" class="link danger" data-act="delete-yes">Confirm delete</button>`
+        : `<button type="button" class="link danger" data-act="delete">Delete</button>`;
+      return `<li class="item editing" style="${s}" data-id="${it.id}">
+        <form data-edit="${it.id}">
+          <div class="row">
+            <label>Template name<input name="title" required maxlength="200" value="${esc(it.title)}"></label>
+            <label>Status<select name="status">${statusOptions(it.status)}</select></label>
+          </div>
+          <label>Notes<textarea name="notes" maxlength="2000">${esc(it.notes || "")}</textarea></label>
+          <div class="actions">${del}<span class="spacer"></span><button type="button" data-act="cancel">Cancel</button><button class="primary" type="submit">Save</button></div>
+        </form></li>`;
+    }
+    const edit = canWrite ? `<button type="button" class="link" data-act="edit" aria-label="Edit ${esc(it.title)}">Edit</button>` : "";
+    return `<li class="item ${it.status}" style="${s}" data-id="${it.id}">
+      <span class="name">${hl(it.title, term)}</span>
+      <span class="right"><span class="badge">${statusLabel(it.status)}</span>${edit}</span>
+      ${it.notes ? `<span class="notes">${hl(it.notes, term)}</span>` : ""}
+    </li>`;
+  }).join("");
+
+  const emptyEl = $("empty-proposed");
+  if (loaded && !shown.length) {
+    emptyEl.textContent = !items.length
+      ? "The list is empty."
+      : "No proposed additions match that search.";
+    emptyEl.classList.remove("hidden");
+  } else emptyEl.classList.add("hidden");
+  return items.filter(it => matchItem(it, term)).length;
+}
+
+function refresh() {
+  const term = q.value.trim().toLowerCase();
+  const curHits = filterView("view-current", "", "empty-current", DATA, term);
+  const sgHits = filterView("view-suggestions", "sg-", "empty-sug", SUGGESTED, term);
+  const propHits = renderProposed();
+  const sugHits = renderSuggestions();
+  $("n-current").textContent = term ? `${curHits}` : `${total}`;
+  $("n-proposed").textContent = loaded ? (term ? `${propHits}` : `${items.length}`) : "";
+  $("n-suggestions").textContent = term ? `${sgHits}` : `${total}`;
+  $("n-noticed").textContent = sLoaded ? (term ? `${sugHits}` : `${notes.length}`) : "";
+  $("summary").textContent = `${total} ticket templates in the app today: ${typeTotal("incident")} incidents and ${typeTotal("service")} service requests` +
+    (loaded ? `, plus ${items.length} proposed addition${items.length === 1 ? "" : "s"}.` : ".");
+  const parts = [`${curHits} current template${curHits === 1 ? "" : "s"}`];
+  if (loaded) parts.push(`${propHits} proposed addition${propHits === 1 ? "" : "s"}`);
+  if (sLoaded) parts.push(`${sugHits} thing${sugHits === 1 ? "" : "s"} noticed`);
+  statusEl.textContent = term
+    ? `“${q.value.trim()}” matches ` + (parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0]) + "."
+    : "";
+}
+
+function setNote(text, warn) {
+  pNote.textContent = text || "";
+  pNote.classList.toggle("hidden", !text);
+  pNote.classList.toggle("warn", !!warn);
+}
+
+async function write(fn) {
+  try { await fn(); setNote(""); }
+  catch (e) {
+    if (e && e.code === "invalid_argument") { canWrite = false; setNote("You can view this list but not change it.", false); }
+    else if (e && e.code === "quota_exceeded") setNote("The list is full. Delete some entries before adding more.", true);
+    else setNote("That change didn’t save. Check your connection and try again.", true);
+    refresh();
+  }
+}
+
+plist.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]");
+  if (!b) return;
+  const id = b.closest("[data-id]").dataset.id;
+  const act = b.dataset.act;
+  if (act === "edit") { editingId = id; confirmDeleteId = null; refresh(); const f = plist.querySelector(`[data-edit="${id}"] input`); if (f) f.focus(); }
+  else if (act === "cancel") { editingId = null; confirmDeleteId = null; refresh(); }
+  else if (act === "delete") { confirmDeleteId = id; refresh(); }
+  else if (act === "delete-yes") { confirmDeleteId = null; editingId = null; write(() => col.doc(id).delete()); }
+});
+
+plist.addEventListener("submit", e => {
+  const f = e.target.closest("[data-edit]");
+  if (!f) return;
+  e.preventDefault();
+  const id = f.dataset.edit;
+  const title = f.elements.title.value.trim();
+  if (!title) return;
+  const data = { title, status: f.elements.status.value, notes: f.elements.notes.value.trim() };
+  editingId = null;
+  write(() => col.doc(id).update(data));
+});
+
+setNote("");
+
+/* ---------- Suggestions (notes with pasted photos) ---------- */
+let notes = [{"id": "nsnq4z917u9qs1kvcw9d", "text": "Look at Software Install - It is under Hardware and people might mistaken that template for software requests, which should be under the service request category", "images": ["6d313c00c4260433edfe95e9f6893b25"], "createdAt": 1793810486606}], sLoaded = true, sCol = null, assets = null, sCanWrite = false;
+let pending = [];            // [{key, id|null, url|null}]
+let confirmNoteId = null;
+const sNote = $("s-note"), slist = $("slist"), compose = $("compose"), sText = $("s-text"), sPending = $("s-pending");
+const IMAGES = {"6d313c00c4260433edfe95e9f6893b25": "data:image/png;base64,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"};
+const blobUrl = id => IMAGES[id] || "";
+const fmtDate = ms => ms ? new Date(ms).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "";
+
+function setSNote(text, warn) {
+  sNote.textContent = text || "";
+  sNote.classList.toggle("hidden", !text);
+  sNote.classList.toggle("warn", !!warn);
+}
+
+function renderPending() {
+  sPending.innerHTML = pending.map(p => `<div class="thumb" data-key="${p.key}">
+    ${p.url ? `<img src="${esc(p.url)}" alt="Pasted photo" data-full="${esc(p.url)}">` : `<span class="busy">Uploading…</span>`}
+    <button type="button" class="x" data-remove="${p.key}" aria-label="Remove photo">×</button></div>`).join("");
+}
+
+async function addPhotos(files) {
+  if (!assets) { setSNote("Photos can only be added by people who can edit this page.", true); return; }
+  for (const f of files) {
+    if (!f || !f.type || !f.type.startsWith("image/")) continue;
+    if (f.size > 20 * 1024 * 1024) { setSNote("That photo is over 20 MB. Try a smaller screenshot.", true); continue; }
+    const p = { key: Math.random().toString(36).slice(2), id: null, url: null };
+    pending.push(p); renderPending();
+    try {
+      const r = await assets.upload(f, { type: f.type });
+      p.id = r.id; p.url = r.url || blobUrl(r.id);
+      if (!pending.includes(p)) { try { await assets.delete(r.id); } catch (_) {} }
+      setSNote("");
+    } catch (e) {
+      pending = pending.filter(x => x !== p);
+      setSNote(e && e.code === "quota_exceeded" ? "Photo storage is full. Delete some older notes with photos first." : "That photo didn’t upload. Try pasting it again.", true);
+    }
+    renderPending();
+  }
+}
+
+sText.addEventListener("paste", e => {
+  const files = [...(e.clipboardData ? e.clipboardData.items : [])].filter(i => i.kind === "file" && i.type.startsWith("image/")).map(i => i.getAsFile());
+  if (files.length) { e.preventDefault(); addPhotos(files); }
+});
+compose.addEventListener("dragover", e => { e.preventDefault(); compose.classList.add("drag"); });
+compose.addEventListener("dragleave", () => compose.classList.remove("drag"));
+compose.addEventListener("drop", e => {
+  e.preventDefault(); compose.classList.remove("drag");
+  addPhotos([...(e.dataTransfer ? e.dataTransfer.files : [])]);
+});
+$("s-photo").addEventListener("click", () => $("s-file").click());
+$("s-file").addEventListener("change", e => { addPhotos([...e.target.files]); e.target.value = ""; });
+sPending.addEventListener("click", async e => {
+  const b = e.target.closest("[data-remove]");
+  if (!b) return;
+  const p = pending.find(x => x.key === b.dataset.remove);
+  pending = pending.filter(x => x !== p); renderPending();
+  if (p && p.id && assets) { try { await assets.delete(p.id); } catch (_) {} }
+});
+
+$("s-save").addEventListener("click", async () => {
+  const text = sText.value.trim();
+  if (pending.some(p => !p.id)) { setSNote("Wait for the photos to finish uploading, then save.", false); return; }
+  const images = pending.map(p => p.id);
+  if (!text && !images.length) { sText.focus(); return; }
+  if (!sCol) return;
+  const data = { text, images, createdAt: Date.now() };
+  sText.value = ""; pending = []; renderPending();
+  try { await sCol.doc().set(data); setSNote(""); }
+  catch (e) {
+    sText.value = text; pending = images.map(id => ({ key: id, id, url: blobUrl(id) })); renderPending();
+    if (e && e.code === "invalid_argument") { sCanWrite = false; compose.classList.add("hidden"); setSNote("You can read these notes but not add new ones."); }
+    else setSNote("That note didn’t save. Check your connection and try again.", true);
+  }
+});
+
+function renderSuggestions() {
+  const term = q.value.trim().toLowerCase();
+  const shown = notes.filter(n => !term || n.text.toLowerCase().includes(term));
+  slist.classList.toggle("hidden", !shown.length);
+  slist.innerHTML = shown.map(n => {
+    const del = !sCanWrite ? "" : confirmNoteId === n.id
+      ? `<span><button type="button" class="link" data-nact="keep">Keep</button><button type="button" class="link danger" data-nact="delete-yes">Confirm delete</button></span>`
+      : `<button type="button" class="link danger" data-nact="delete">Delete</button>`;
+    return `<li class="sug" data-id="${n.id}">
+      <div class="meta"><span>${esc(fmtDate(n.createdAt))}</span>${del}</div>
+      ${n.text ? `<p class="text">${hl(n.text, term)}</p>` : ""}
+      ${n.images.length ? `<div class="thumbs">${n.images.map(id => `<div class="thumb"><img src="${blobUrl(id)}" alt="Attached photo" loading="lazy" data-full="${blobUrl(id)}"></div>`).join("")}</div>` : ""}
+    </li>`;
+  }).join("");
+  const emptyEl = $("empty-noticed");
+  if (sLoaded && !shown.length) {
+    emptyEl.textContent = notes.length ? "No notes match that search." : "Nothing noted yet.";
+    emptyEl.classList.remove("hidden");
+  } else emptyEl.classList.add("hidden");
+  return shown.length;
+}
+
+slist.addEventListener("click", async e => {
+  const b = e.target.closest("[data-nact]");
+  if (!b) return;
+  const id = b.closest("[data-id]").dataset.id;
+  const act = b.dataset.nact;
+  if (act === "delete") { confirmNoteId = id; refresh(); }
+  else if (act === "keep") { confirmNoteId = null; refresh(); }
+  else if (act === "delete-yes") {
+    confirmNoteId = null;
+    const n = notes.find(x => x.id === id);
+    try {
+      await sCol.doc(id).delete();
+      if (n && assets) for (const img of n.images) { try { await assets.delete(img); } catch (_) {} }
+    } catch (_) { setSNote("That note didn’t delete. Try again.", true); refresh(); }
+  }
+});
+
+// Click any photo to see it full size
+document.addEventListener("click", e => {
+  const img = e.target.closest("img[data-full]");
+  if (img) { const lb = $("lightbox"); lb.querySelector("img").src = img.dataset.full; lb.classList.remove("hidden"); return; }
+  if (e.target.closest("#lightbox")) $("lightbox").classList.add("hidden");
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("lightbox").classList.add("hidden"); });
+
+setSNote("");
+
+/* ---------- Tabs, search, expand/collapse ---------- */
+function showView(v) {
+  const VIEWS = ["current", "suggestions", "proposed", "noticed"];
+  if (!VIEWS.includes(v)) v = "current";
+  VIEWS.forEach(k => {
+    $("view-" + k).classList.toggle("hidden", k !== v);
+    $("tab-" + k).setAttribute("aria-selected", String(k === v));
+  });
+  const tree = v === "current" || v === "suggestions";
+  $("expand").classList.toggle("hidden", !tree);
+  $("collapse").classList.toggle("hidden", !tree);
+}
+document.querySelector(".tabs").addEventListener("click", e => {
+  const t = e.target.closest("[data-view]");
+  if (t) { location.hash = t.dataset.view; showView(t.dataset.view); }
+});
+window.addEventListener("hashchange", () => showView(location.hash.slice(1)));
+showView(location.hash.slice(1));
+
+q.addEventListener("input", refresh);
+$("expand").addEventListener("click", () => document.querySelectorAll("#view-current details, #view-suggestions details").forEach(d => d.open = true));
+$("collapse").addEventListener("click", () => document.querySelectorAll("#view-current details, #view-suggestions details").forEach(d => d.open = false));
+refresh();
+</script>
+</body>
+</html>
